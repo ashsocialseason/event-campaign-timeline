@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Campaign Calendar - Client Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .lucide {
+            width: 1em;
+            height: 1em;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="app" class="max-w-7xl mx-auto p-6 min-h-screen">
+        <!-- Loading state -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <div class="animate-pulse">
+                <div class="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lucide icons as SVG strings
+        const icons = {
+            calendar: '<svg class="lucide" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+            clock: '<svg class="lucide" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>',
+            target: '<svg class="lucide" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+            mail: '<svg class="lucide" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+            users: '<svg class="lucide" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+            zap: '<svg class="lucide" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg>',
+            checkCircle: '<svg class="lucide" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>',
+            alertTriangle: '<svg class="lucide" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+            barChart3: '<svg class="lucide" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>'
+        };
+
+        // Campaign data
+        const campaignData = {
+            1: {
+                phase: 'Pre-Event Preparation',
+                activities: [
+                    { day: 'Monday', type: 'setup', icon: 'target', tasks: [
+                        'Create event-specific campaign folder in project management system',
+                        'Set up Meta Ads campaign architecture',
+                        'Request creative assets from client (event artwork, venue photos, artist/performer assets)'
+                    ]},
+                    { day: 'Wednesday', type: 'audience', icon: 'users', tasks: [
+                        'Build custom audiences from past events',
+                        'Create lookalike audiences for targeting',
+                        'Set up conversion tracking for ticket sales'
+                    ]},
+                    { day: 'Friday', type: 'strategy', icon: 'barChart3', tasks: [
+                        'Establish budget allocation framework across all phases',
+                        'Develop key selling points and value propositions',
+                        'Create urgency and scarcity messaging templates'
+                    ]}
+                ]
+            },
+            2: {
+                phase: 'Pre-Event Preparation',
+                activities: [
+                    { day: 'Monday', type: 'email', icon: 'mail', tasks: [
+                        'Segment email audiences by location and interest',
+                        'Create event-specific tags and categories',
+                        'Set up tracking for email engagement'
+                    ]},
+                    { day: 'Wednesday', type: 'automation', icon: 'zap', tasks: [
+                        'Configure automation triggers and suppression lists',
+                        'Plan social proof and testimonial integration',
+                        'Establish call-to-action variations'
+                    ]},
+                    { day: 'Friday', type: 'review', icon: 'checkCircle', tasks: [
+                        'Design cross-platform content consistency guidelines',
+                        'Create asset approval timeline with client',
+                        'Internal campaign review and approval'
+                    ]}
+                ]
+            },
+            3: {
+                phase: 'Teaser Phase',
+                activities: [
+                    { day: 'Monday', type: 'launch', icon: 'zap', tasks: [
+                        '🚀 TEASER LAUNCH: Meta Ads Awareness & Subscriber Driver Campaign (10% budget)',
+                        'Objective: Engagement | Audience: Advantage+ with Interest Suggestions',
+                        'Creative: Teaser videos, countdown graphics, venue shots'
+                    ]},
+                    { day: 'Tuesday', type: 'social', icon: 'users', tasks: [
+                        'Post "Upcoming Announcement" organic content on social media',
+                        'Monitor teaser campaign performance and engagement'
+                    ]},
+                    { day: 'Wednesday', type: 'content', icon: 'calendar', tasks: [
+                        'Post "Countdown Style" teaser content',
+                        'Track email subscriber growth from teaser campaigns',
+                        'Optimize ad targeting based on early engagement data'
+                    ]},
+                    { day: 'Friday', type: 'review', icon: 'barChart3', tasks: [
+                        'Weekly teaser phase performance review',
+                        'Prepare announcement phase materials',
+                        'Finalize announcement creative assets with client'
+                    ]}
+                ]
+            },
+            4: {
+                phase: 'Announcement & Presale Launch',
+                activities: [
+                    { day: 'Monday', type: 'launch', icon: 'zap', tasks: [
+                        '🚀 ANNOUNCEMENT LAUNCH: Meta Ads Announcement Campaign',
+                        '🚀 Launch Pre-Sale Sign Up Campaign (Conversions optimized)',
+                        'Post "Official Announcement" on all social platforms',
+                        'Send "Just Announced + Presale Details" email'
+                    ]},
+                    { day: 'Wednesday', type: 'optimize', icon: 'target', tasks: [
+                        'Monitor announcement engagement and reach',
+                        'Track presale list signups and conversions',
+                        'Post "Lineup/Details Focus" content',
+                        'Optimize announcement campaigns based on performance'
+                    ]},
+                    { day: 'Thursday/Friday', type: 'presale', icon: 'alertTriangle', tasks: [
+                        '🎫 PRESALE LAUNCH: Send "Presale is now open" email',
+                        'Launch presale ticket sales',
+                        'Switch focus to presale conversion campaigns'
+                    ]}
+                ]
+            },
+            5: {
+                phase: 'Presale & General Sale Transition',
+                activities: [
+                    { day: 'Monday', type: 'monitor', icon: 'barChart3', tasks: [
+                        'Monitor presale ticket sales and conversion rates',
+                        'Post social proof updates showing tickets sold',
+                        'Optimize presale campaigns based on performance'
+                    ]},
+                    { day: 'Wednesday', type: 'urgency', icon: 'clock', tasks: [
+                        'Send "Limited Time Remaining" email to non-purchasers',
+                        'Post urgency updates on social media',
+                        'Increase ad frequency for warm audiences'
+                    ]},
+                    { day: 'Friday', type: 'transition', icon: 'zap', tasks: [
+                        'Send "Final Hours - Presale Ends Tonight" email',
+                        'Post "Last chance presale" social content',
+                        '🚀 GENERAL SALE LAUNCH preparation'
+                    ]}
+                ]
+            },
+            6: {
+                phase: 'General Sale Phase',
+                activities: [
+                    { day: 'Monday', type: 'launch', icon: 'zap', tasks: [
+                        '🚀 GENERAL SALE LAUNCH: General Sale Campaign (Advantage+)',
+                        '🚀 Launch Retargeting Campaign (15% budget)',
+                        'Post "Tickets On Sale Now!" on social media',
+                        'Send "Tickets On Sale Now" email to all subscribers'
+                    ]},
+                    { day: 'Wednesday', type: 'monitor', icon: 'barChart3', tasks: [
+                        'Monitor general sale performance and ticket sales',
+                        'Post "Social Proof" content showing community building',
+                        'Optimize campaigns based on conversion data'
+                    ]},
+                    { day: 'Friday', type: 'review', icon: 'checkCircle', tasks: [
+                        'Weekly performance review',
+                        'Adjust budget allocation based on performance',
+                        'Plan ongoing general sale activities'
+                    ]}
+                ]
+            },
+            7: {
+                phase: 'General Sale Phase (Ongoing)',
+                activities: [
+                    { day: 'Monday', type: 'optimize', icon: 'target', tasks: [
+                        'Review and optimize general sale campaigns',
+                        'Monitor ticket sales progress and inventory',
+                        'Adjust targeting and creative based on performance'
+                    ]},
+                    { day: 'Wednesday', type: 'community', icon: 'users', tasks: [
+                        'Post community building and excitement content',
+                        'Engage with social media comments and shares',
+                        'Monitor email engagement and list growth'
+                    ]},
+                    { day: 'Friday', type: 'analysis', icon: 'barChart3', tasks: [
+                        'Weekly performance analysis',
+                        'Plan next week\'s content and optimizations',
+                        'Update client on sales progress'
+                    ]}
+                ]
+            },
+            8: {
+                phase: 'General Sale Phase (Ongoing)',
+                activities: [
+                    { day: 'Monday', type: 'optimize', icon: 'target', tasks: [
+                        'Review and optimize general sale campaigns',
+                        'Monitor ticket sales progress and inventory',
+                        'Adjust targeting and creative based on performance'
+                    ]},
+                    { day: 'Wednesday', type: 'community', icon: 'users', tasks: [
+                        'Post community building and excitement content',
+                        'Engage with social media comments and shares',
+                        'Monitor email engagement and list growth'
+                    ]},
+                    { day: 'Friday', type: 'analysis', icon: 'barChart3', tasks: [
+                        'Weekly performance analysis',
+                        'Plan next week\'s content and optimizations',
+                        'Update client on sales progress'
+                    ]}
+                ]
+            },
+            9: {
+                phase: 'General Sale Phase (Ongoing)',
+                activities: [
+                    { day: 'Monday', type: 'optimize', icon: 'target', tasks: [
+                        'Review and optimize general sale campaigns',
+                        'Monitor ticket sales progress and inventory',
+                        'Adjust targeting and creative based on performance'
+                    ]},
+                    { day: 'Wednesday', type: 'community', icon: 'users', tasks: [
+                        'Post community building and excitement content',
+                        'Engage with social media comments and shares',
+                        'Monitor email engagement and list growth'
+                    ]},
+                    { day: 'Friday', type: 'analysis', icon: 'barChart3', tasks: [
+                        'Weekly performance analysis',
+                        'Plan next week\'s content and optimizations',
+                        'Update client on sales progress'
+                    ]}
+                ]
+            },
+            10: {
+                phase: 'General Sale - Pre Home Run',
+                activities: [
+                    { day: 'Monday', type: 'continue', icon: 'target', tasks: [
+                        'Continue general sale campaigns',
+                        'Assess remaining ticket inventory',
+                        'Prepare home run phase materials'
+                    ]},
+                    { day: 'Wednesday', type: 'urgency', icon: 'clock', tasks: [
+                        'Send "Don\'t Miss Out" email to engaged non-purchasers',
+                        'Post social proof and community building content',
+                        'Finalize home run phase campaign setup'
+                    ]},
+                    { day: 'Friday', type: 'prep', icon: 'checkCircle', tasks: [
+                        'Review general sale phase performance',
+                        'Client approval for home run phase campaigns',
+                        'Plan final push strategy based on remaining tickets'
+                    ]}
+                ]
+            },
+            11: {
+                phase: 'Home Run Phase',
+                activities: [
+                    { day: 'Monday', type: 'launch', icon: 'zap', tasks: [
+                        '🚀 HOME RUN LAUNCH: Final Push Campaign (20% budget)',
+                        'Objective: Conversions | Audience: All previous engagers, broad targeting',
+                        'Post "Final Countdown" content on social media',
+                        'Send "Final Weeks!" email to non-ticket holders'
+                    ]},
+                    { day: 'Wednesday', type: 'intensity', icon: 'alertTriangle', tasks: [
+                        'Monitor final push campaign performance',
+                        'Post limited availability messaging',
+                        'Increase ad frequency for highest-intent audiences'
+                    ]},
+                    { day: 'Friday', type: 'strategy', icon: 'barChart3', tasks: [
+                        'Analyze remaining ticket availability',
+                        'Plan final week strategy',
+                        'Prepare sold out prevention campaigns'
+                    ]}
+                ]
+            },
+            12: {
+                phase: 'Final Week Push',
+                activities: [
+                    { day: 'Monday', type: 'launch', icon: 'zap', tasks: [
+                        '🚀 Sold Out Prevention Campaign (10% budget)',
+                        'Objective: Conversions | Audience: Highest-intent audiences',
+                        'Post "Final Days" messaging across platforms',
+                        'Increase urgency in all communications'
+                    ]},
+                    { day: 'Wednesday', type: 'final', icon: 'alertTriangle', tasks: [
+                        'Send "Last Chance Warning" email to engaged non-purchasers',
+                        'Post scarcity messaging on social media',
+                        'Monitor real-time sales performance'
+                    ]},
+                    { day: 'Friday/Weekend', type: 'push', icon: 'clock', tasks: [
+                        '⏰ FINAL PUSH: Send "Final Hours/Days" email',
+                        'Post "Final Call" social content',
+                        'Maximize ad spend on highest-converting audiences',
+                        'Monitor ticket inventory in real-time'
+                    ]}
+                ]
+            },
+            13: {
+                phase: 'Post-Event Activities',
+                activities: [
+                    { day: 'Day After Event', type: 'thanks', icon: 'checkCircle', tasks: [
+                        'Launch thank you campaign (5% budget)',
+                        'Post event highlights and thank you content',
+                        'Send "Thank You for an Amazing Night!" email'
+                    ]},
+                    { day: 'Mid-Week', type: 'collect', icon: 'users', tasks: [
+                        'Collect event photos and testimonials',
+                        'Launch nurture campaign for non-attendees (5% budget)',
+                        'Post highlights reel and social proof'
+                    ]},
+                    { day: 'Friday', type: 'analyze', icon: 'barChart3', tasks: [
+                        'Compile event performance data',
+                        'Send "You\'re Part of Our Community" email',
+                        'Begin campaign performance analysis'
+                    ]}
+                ]
+            },
+            14: {
+                phase: 'Campaign Wrap-up',
+                activities: [
+                    { day: 'Monday', type: 'report', icon: 'barChart3', tasks: [
+                        'Complete campaign performance report',
+                        'Document lessons learned and optimizations',
+                        'Plan template improvements for next event'
+                    ]},
+                    { day: 'Wednesday', type: 'review', icon: 'checkCircle', tasks: [
+                        'Client performance review meeting',
+                        'Present campaign results and insights',
+                        'Discuss next event planning'
+                    ]},
+                    { day: 'Friday', type: 'archive', icon: 'target', tasks: [
+                        'Update campaign templates based on learnings',
+                        'Archive campaign assets and data',
+                        'Prepare for next event campaign setup'
+                    ]}
+                ]
+            }
+        };
+
+        const phases = [
+            { id: 'prep', name: 'Pre-Event Prep', weeks: [1, 2], color: 'bg-blue-500' },
+            { id: 'teaser', name: 'Teaser Phase', weeks: [3], color: 'bg-purple-500' },
+            { id: 'announce', name: 'Announcement', weeks: [4], color: 'bg-green-500' },
+            { id: 'presale', name: 'Presale Phase', weeks: [4, 5], color: 'bg-yellow-500' },
+            { id: 'general', name: 'General Sale', weeks: [5, 6, 7, 8, 9, 10], color: 'bg-orange-500' },
+            { id: 'homerun', name: 'Home Run Phase', weeks: [11, 12], color: 'bg-red-500' },
+            { id: 'post', name: 'Post-Event', weeks: [13, 14], color: 'bg-gray-500' }
+        ];
+
+        let selectedWeek = 1;
+
+        function getActivityTypeColor(type) {
+            const colors = {
+                setup: 'bg-blue-100 text-blue-800',
+                audience: 'bg-purple-100 text-purple-800',
+                strategy: 'bg-green-100 text-green-800',
+                email: 'bg-orange-100 text-orange-800',
+                automation: 'bg-yellow-100 text-yellow-800',
+                review: 'bg-gray-100 text-gray-800',
+                launch: 'bg-red-100 text-red-800',
+                social: 'bg-pink-100 text-pink-800',
+                content: 'bg-indigo-100 text-indigo-800',
+                optimize: 'bg-cyan-100 text-cyan-800',
+                presale: 'bg-green-100 text-green-800',
+                monitor: 'bg-blue-100 text-blue-800',
+                urgency: 'bg-red-100 text-red-800',
+                transition: 'bg-purple-100 text-purple-800',
+                community: 'bg-pink-100 text-pink-800',
+                analysis: 'bg-gray-100 text-gray-800',
+                continue: 'bg-blue-100 text-blue-800',
+                prep: 'bg-green-100 text-green-800',
+                intensity: 'bg-red-100 text-red-800',
+                final: 'bg-red-100 text-red-800',
+                push: 'bg-red-100 text-red-800',
+                thanks: 'bg-green-100 text-green-800',
+                collect: 'bg-blue-100 text-blue-800',
+                analyze: 'bg-gray-100 text-gray-800',
+                report: 'bg-blue-100 text-blue-800',
+                archive: 'bg-gray-100 text-gray-800'
+            };
+            return colors[type] || 'bg-gray-100 text-gray-800';
+        }
+
+        function selectWeek(week) {
+            selectedWeek = week;
+            render();
+        }
+
+        function render() {
+            const weekData = campaignData[selectedWeek];
+            
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                                ${icons.calendar}
+                                Event Campaign Calendar
+                            </h1>
+                            <p class="text-gray-600 mt-2">12-Week Event Promotion Timeline - Client View</p>
+                        </div>
+                    </div>
+
+                    <!-- Phase Timeline -->
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold mb-4">Campaign Phases</h2>
+                        <div class="flex flex-wrap gap-2">
+                            ${phases.map(phase => `
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded ${phase.color}"></div>
+                                    <span class="text-sm font-medium">${phase.name}</span>
+                                    <span class="text-xs text-gray-500">
+                                        (Week${phase.weeks.length > 1 ? 's' : ''} ${phase.weeks.join(', ')})
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Week Navigation -->
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold mb-4">Select Week</h2>
+                        <div class="grid grid-cols-7 gap-2">
+                            ${Array.from({ length: 14 }, (_, i) => i + 1).map(week => {
+                                const phase = phases.find(p => p.weeks.includes(week));
+                                return `
+                                    <button
+                                        onclick="selectWeek(${week})"
+                                        class="p-3 rounded-lg border-2 transition-all ${
+                                            selectedWeek === week
+                                                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                : 'border-gray-200 hover:border-gray-300 bg-white'
+                                        }"
+                                    >
+                                        <div class="text-sm font-semibold">Week ${week}</div>
+                                        ${phase ? `<div class="w-2 h-2 rounded-full mx-auto mt-1 ${phase.color}"></div>` : ''}
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Week Details -->
+                ${weekData ? `
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900">Week ${selectedWeek}</h2>
+                                <p class="text-lg text-gray-600">${weekData.phase}</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm text-gray-500">Total Activities</div>
+                                <div class="text-2xl font-bold text-blue-600">
+                                    ${weekData.activities.reduce((acc, activity) => acc + activity.tasks.length, 0)}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            ${weekData.activities.map(activity => `
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <div class="p-2 rounded-lg ${getActivityTypeColor(activity.type)}">
+                                            ${icons[activity.icon] || icons.target}
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg font-semibold">${activity.day}</h3>
+                                            <span class="px-2 py-1 rounded-full text-xs font-medium ${getActivityTypeColor(activity.type)}">
+                                                ${activity.type.charAt(0).toUpperCase() + activity.type.slice(1)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-2">
+                                        ${activity.tasks.map(task => `
+                                            <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                                                <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                                                <p class="text-gray-700 leading-relaxed">${task}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <!-- Daily Recurring Activities Note -->
+                        <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <h3 class="font-semibold text-blue-800 mb-2">Daily Recurring Activities</h3>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm text-blue-700">
+                                <div>
+                                    <strong>Monday - Planning Day:</strong>
+                                    <ul class="list-disc list-inside mt-1 space-y-1">
+                                        <li>Week planning and priority setting</li>
+                                        <li>Campaign performance review</li>
+                                        <li>Content calendar updates</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <strong>Tuesday-Thursday - Execution:</strong>
+                                    <ul class="list-disc list-inside mt-1 space-y-1">
+                                        <li>Monitor campaign performance daily</li>
+                                        <li>Optimize ads based on conversion data</li>
+                                        <li>Create and schedule content</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <strong>Friday - Review Day:</strong>
+                                    <ul class="list-disc list-inside mt-1 space-y-1">
+                                        <li>Weekly performance analysis</li>
+                                        <li>Client updates and reporting</li>
+                                        <li>Next week planning</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Monthly Tasks Note -->
+                        <div class="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                            <h3 class="font-semibold text-green-800 mb-2">Monthly Recurring Tasks</h3>
+                            <div class="grid md:grid-cols-3 gap-4 text-sm text-green-700">
+                                <div>
+                                    <strong>First Monday:</strong>
+                                    <ul class="list-disc list-inside mt-1">
+                                        <li>Monthly strategy session with client</li>
+                                        <li>Review upcoming events calendar</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <strong>Mid-Month:</strong>
+                                    <ul class="list-disc list-inside mt-1">
+                                        <li>Template performance review</li>
+                                        <li>Budget reallocation if needed</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <strong>Month-End:</strong>
+                                    <ul class="list-disc list-inside mt-1">
+                                        <li>Monthly performance report</li>
+                                        <li>Client review meeting</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
